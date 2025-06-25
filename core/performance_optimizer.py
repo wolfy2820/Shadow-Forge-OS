@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
 """
-ShadowForge OS - Real-Time Performance Optimization Engine
-AI-powered continuous system performance optimization
+ShadowForge OS Performance Optimizer - Ultra-High Performance Engine
+Revolutionary performance monitoring and optimization with quantum-enhanced algorithms
 
-This system provides real-time performance monitoring, bottleneck detection,
-and automated optimization of all ShadowForge OS components for maximum efficiency.
+Features:
+- Real-time performance monitoring and bottleneck detection
+- AI-powered optimization strategy generation
+- Quantum-enhanced performance algorithms
+- Autonomous resource management
+- Revenue-focused optimization
+- Self-evolving performance models
+- Memory leak prevention and garbage collection optimization
+- Async/await performance optimization
 """
 
 import asyncio
@@ -16,13 +23,15 @@ import psutil
 import gc
 import os
 import sys
+import weakref
 from typing import Dict, List, Any, Optional, Tuple, Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from collections import deque
+from collections import deque, defaultdict
 import multiprocessing
 import concurrent.futures
+from contextlib import asynccontextmanager
 
 # Performance profiling and optimization
 try:
@@ -48,6 +57,164 @@ try:
     ML_AVAILABLE = True
 except ImportError:
     ML_AVAILABLE = False
+
+@dataclass
+class PerformanceMetrics:
+    """Real-time performance metrics tracking."""
+    cpu_usage: float = 0.0
+    memory_usage: float = 0.0
+    memory_peak: float = 0.0
+    async_tasks: int = 0
+    database_queries: int = 0
+    api_requests: int = 0
+    avg_response_time: float = 0.0
+    cache_hit_ratio: float = 0.0
+    error_rate: float = 0.0
+    timestamp: float = field(default_factory=time.time)
+
+class AsyncTaskManager:
+    """Advanced async task management with monitoring."""
+    
+    def __init__(self, max_concurrent: int = 100):
+        self.max_concurrent = max_concurrent
+        self.active_tasks: Dict[str, asyncio.Task] = {}
+        self.task_metrics = defaultdict(int)
+        self.task_times = defaultdict(float)
+        self.semaphore = asyncio.Semaphore(max_concurrent)
+        self.logger = logging.getLogger(f"{__name__}.AsyncTaskManager")
+    
+    @asynccontextmanager
+    async def managed_task(self, task_name: str):
+        """Context manager for tracked async tasks."""
+        start_time = time.time()
+        task_id = f"{task_name}_{int(start_time * 1000000)}"
+        
+        async with self.semaphore:
+            try:
+                self.active_tasks[task_id] = asyncio.current_task()
+                self.task_metrics[task_name] += 1
+                self.logger.debug(f"Started task: {task_name}")
+                yield task_id
+            finally:
+                execution_time = time.time() - start_time
+                self.task_times[task_name] = execution_time
+                self.active_tasks.pop(task_id, None)
+                self.logger.debug(f"Completed task: {task_name} in {execution_time:.3f}s")
+
+class MemoryOptimizer:
+    """Advanced memory management and optimization."""
+    
+    def __init__(self, max_cache_size: int = 10000):
+        self.max_cache_size = max_cache_size
+        self.cache_stats = defaultdict(int)
+        self.weak_refs: Dict[str, weakref.WeakSet] = defaultdict(weakref.WeakSet)
+        self.logger = logging.getLogger(f"{__name__}.MemoryOptimizer")
+        
+    def register_cache(self, cache_name: str, cache_obj: Any):
+        """Register cache for monitoring."""
+        self.weak_refs[cache_name].add(cache_obj)
+        
+    def optimize_memory(self) -> Dict[str, Any]:
+        """Perform memory optimization."""
+        initial_memory = psutil.Process().memory_info().rss / 1024 / 1024
+        
+        # Force garbage collection
+        collected = gc.collect()
+        
+        # Clear dead weak references
+        for cache_name in self.weak_refs:
+            dead_refs = [ref for ref in self.weak_refs[cache_name] if ref() is None]
+            for ref in dead_refs:
+                self.weak_refs[cache_name].discard(ref)
+        
+        final_memory = psutil.Process().memory_info().rss / 1024 / 1024
+        freed_memory = initial_memory - final_memory
+        
+        result = {
+            "initial_memory_mb": initial_memory,
+            "final_memory_mb": final_memory,
+            "freed_memory_mb": freed_memory,
+            "objects_collected": collected,
+            "active_caches": len(self.weak_refs)
+        }
+        
+        self.logger.info(f"Memory optimization: {freed_memory:.2f}MB freed, {collected} objects collected")
+        return result
+
+class DatabaseConnectionPool:
+    """High-performance async database connection pool."""
+    
+    def __init__(self, db_path: str, max_connections: int = 20):
+        self.db_path = db_path
+        self.max_connections = max_connections
+        self.available_connections = asyncio.Queue(maxsize=max_connections)
+        self.active_connections = 0
+        self.connection_stats = defaultdict(int)
+        self.lock = asyncio.Lock()
+        self.logger = logging.getLogger(f"{__name__}.DatabasePool")
+        
+    async def initialize(self):
+        """Initialize the connection pool."""
+        try:
+            import aiosqlite
+            self.aiosqlite = aiosqlite
+            
+            # Pre-populate pool with connections
+            for _ in range(min(5, self.max_connections)):
+                conn = await aiosqlite.connect(self.db_path)
+                await self.available_connections.put(conn)
+                self.active_connections += 1
+                
+            self.logger.info(f"Database pool initialized with {self.active_connections} connections")
+            
+        except ImportError:
+            self.logger.warning("aiosqlite not available, falling back to sync operations")
+            self.aiosqlite = None
+    
+    @asynccontextmanager
+    async def get_connection(self):
+        """Get a database connection from the pool."""
+        if not self.aiosqlite:
+            # Fallback to sync connection
+            import sqlite3
+            conn = sqlite3.connect(self.db_path)
+            try:
+                yield conn
+            finally:
+                conn.close()
+            return
+        
+        conn = None
+        try:
+            # Try to get existing connection
+            try:
+                conn = await asyncio.wait_for(
+                    self.available_connections.get(),
+                    timeout=1.0
+                )
+            except asyncio.TimeoutError:
+                # Create new connection if pool is empty and under limit
+                async with self.lock:
+                    if self.active_connections < self.max_connections:
+                        conn = await self.aiosqlite.connect(self.db_path)
+                        self.active_connections += 1
+                    else:
+                        # Wait for available connection
+                        conn = await self.available_connections.get()
+            
+            self.connection_stats["connections_used"] += 1
+            yield conn
+            
+        finally:
+            if conn:
+                # Return connection to pool
+                try:
+                    await self.available_connections.put(conn)
+                except asyncio.QueueFull:
+                    # Pool is full, close connection
+                    await conn.close()
+                    async with self.lock:
+                        self.active_connections -= 1
 
 class OptimizationType(Enum):
     """Types of performance optimizations."""
@@ -122,10 +289,15 @@ class PerformanceOptimizer:
     def __init__(self):
         self.logger = logging.getLogger(f"{__name__}.performance_optimizer")
         
-        # Performance monitoring
+        # Enhanced performance monitoring with new components
         self.performance_profiles: Dict[str, PerformanceProfile] = {}
         self.optimization_strategies: Dict[str, OptimizationStrategy] = {}
         self.performance_history: deque = deque(maxlen=10000)
+        
+        # Advanced performance management
+        self.task_manager = AsyncTaskManager(max_concurrent=50)
+        self.memory_optimizer = MemoryOptimizer(max_cache_size=5000)
+        self.db_pool = None  # Initialized during setup
         
         # Optimization state
         self.active_optimizations: Dict[str, Dict[str, Any]] = {}
@@ -1172,3 +1344,39 @@ class PerformanceOptimizer:
             "cpu_utilization": 0.6, # 60% target
             "memory_usage": 0.7     # 70% target
         })
+
+# Global performance optimizer instance
+_performance_optimizer = None
+
+def get_performance_optimizer() -> PerformanceOptimizer:
+    """Get the global performance optimizer instance."""
+    global _performance_optimizer
+    if _performance_optimizer is None:
+        _performance_optimizer = PerformanceOptimizer()
+    return _performance_optimizer
+
+# Decorator for performance monitoring
+def monitor_performance(func_name: str = None):
+    """Decorator to monitor function performance."""
+    def decorator(func):
+        nonlocal func_name
+        if func_name is None:
+            func_name = func.__name__
+            
+        if asyncio.iscoroutinefunction(func):
+            async def async_wrapper(*args, **kwargs):
+                optimizer = get_performance_optimizer()
+                async with optimizer.task_manager.managed_task(func_name):
+                    return await func(*args, **kwargs)
+            return async_wrapper
+        else:
+            def sync_wrapper(*args, **kwargs):
+                start_time = time.time()
+                try:
+                    return func(*args, **kwargs)
+                finally:
+                    execution_time = time.time() - start_time
+                    optimizer = get_performance_optimizer()
+                    optimizer.task_manager.task_times[func_name] = execution_time
+            return sync_wrapper
+    return decorator
