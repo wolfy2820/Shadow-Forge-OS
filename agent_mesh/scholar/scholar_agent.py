@@ -203,7 +203,7 @@ class ScholarAgent:
         
         # Research and analysis
         self.research_findings: List[Dict[str, Any]] = []
-        self.performance_insights: List[Dict[str, Any]] = []
+        self.performance_insights: Dict[str, Dict[str, Any]] = {}
         self.improvement_recommendations: List[Dict[str, Any]] = []
         
         # Tools
@@ -566,5 +566,121 @@ class ScholarAgent:
             except Exception as e:
                 self.logger.error(f"❌ Performance monitoring error: {e}")
                 await asyncio.sleep(1800)
+    
+    async def _update_learning_progress(self):
+        """Update learning progress for all active objectives."""
+        try:
+            for objective_id, objective in self.learning_objectives.items():
+                # Simulate learning progress
+                progress_increment = 0.05  # 5% progress per update
+                objective.progress = min(1.0, objective.progress + progress_increment)
+                
+                # Update learning progress tracking
+                self.learning_progress[objective_id] = objective.progress
+                
+                # Check if objective is completed
+                if objective.progress >= 1.0:
+                    self.learning_objectives_achieved += 1
+                    self.logger.info(f"🎓 Learning objective completed: {objective.description}")
+            
+            # Update overall learning metrics
+            total_progress = sum(self.learning_progress.values())
+            avg_progress = total_progress / max(len(self.learning_progress), 1)
+            
+            self.logger.debug(f"📈 Learning progress updated: {avg_progress:.2f} average completion")
+            
+        except Exception as e:
+            self.logger.error(f"❌ Learning progress update failed: {e}")
+    
+    async def _monitor_system_performance(self):
+        """Monitor system performance and identify improvement opportunities."""
+        try:
+            # Simulate performance metrics collection
+            performance_metrics = {
+                "cpu_usage": 0.65 + (datetime.now().second % 10) * 0.01,
+                "memory_usage": 0.75 + (datetime.now().second % 5) * 0.01,
+                "response_time": 150 + (datetime.now().second % 20),
+                "throughput": 1000 + (datetime.now().second % 100),
+                "error_rate": 0.01 + (datetime.now().second % 3) * 0.001
+            }
+            
+            # Analyze performance trends
+            performance_score = (
+                (1 - performance_metrics["cpu_usage"]) * 0.3 +
+                (1 - performance_metrics["memory_usage"]) * 0.3 +
+                min(1.0, 100 / performance_metrics["response_time"]) * 0.2 +
+                min(1.0, performance_metrics["throughput"] / 1000) * 0.2
+            )
+            
+            # Store performance insights
+            timestamp = datetime.now().isoformat()
+            self.performance_insights[timestamp] = {
+                "metrics": performance_metrics,
+                "score": performance_score,
+                "recommendations": []
+            }
+            
+            # Generate improvement recommendations
+            if performance_metrics["cpu_usage"] > 0.8:
+                self.performance_insights[timestamp]["recommendations"].append("optimize_cpu_intensive_operations")
+            
+            if performance_metrics["memory_usage"] > 0.85:
+                self.performance_insights[timestamp]["recommendations"].append("implement_memory_optimization")
+            
+            if performance_metrics["response_time"] > 200:
+                self.performance_insights[timestamp]["recommendations"].append("optimize_response_time")
+            
+            self.logger.debug(f"📊 Performance monitored: {performance_score:.2f} overall score")
+            
+        except Exception as e:
+            self.logger.error(f"❌ Performance monitoring failed: {e}")
+    
+    async def _identify_learning_opportunities(self):
+        """Identify new learning opportunities based on system performance and gaps."""
+        try:
+            # Analyze recent performance insights for learning opportunities
+            recent_insights = list(self.performance_insights.values())[-5:]  # Last 5 insights
+            
+            # Identify patterns and gaps
+            common_recommendations = {}
+            for insight in recent_insights:
+                for recommendation in insight.get("recommendations", []):
+                    common_recommendations[recommendation] = common_recommendations.get(recommendation, 0) + 1
+            
+            # Create learning objectives for frequently needed improvements
+            for recommendation, frequency in common_recommendations.items():
+                if frequency >= 3:  # If recommended 3+ times
+                    learning_domain = self._map_recommendation_to_domain(recommendation)
+                    objective_id = f"learn_{recommendation}_{datetime.now().timestamp()}"
+                    
+                    if objective_id not in self.learning_objectives:
+                        new_objective = LearningObjective(
+                            objective_id=objective_id,
+                            domain=learning_domain,
+                            description=f"Learn to implement {recommendation.replace('_', ' ')}",
+                            success_criteria=["implementation_complete", "performance_improved"],
+                            deadline=datetime.now() + timedelta(days=30),
+                            priority="high",
+                            progress=0.0,
+                            knowledge_gaps=[recommendation]
+                        )
+                        
+                        self.learning_objectives[objective_id] = new_objective
+                        self.logger.info(f"📚 New learning objective identified: {new_objective.description}")
+            
+        except Exception as e:
+            self.logger.error(f"❌ Learning opportunity identification failed: {e}")
+    
+    def _map_recommendation_to_domain(self, recommendation: str) -> LearningDomain:
+        """Map performance recommendations to learning domains."""
+        domain_mapping = {
+            "optimize_cpu_intensive_operations": LearningDomain.SYSTEM_OPTIMIZATION,
+            "implement_memory_optimization": LearningDomain.SYSTEM_OPTIMIZATION,
+            "optimize_response_time": LearningDomain.SYSTEM_OPTIMIZATION,
+            "enhance_security": LearningDomain.SECURITY,
+            "improve_algorithms": LearningDomain.ALGORITHMS,
+            "upgrade_architecture": LearningDomain.SYSTEM_DESIGN
+        }
+        return domain_mapping.get(recommendation, LearningDomain.RESEARCH)
     
     # Additional helper methods would be implemented here...

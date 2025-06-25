@@ -354,6 +354,157 @@ class LiquidityHunter:
             "average_profit_per_trade": str(self.total_profit / max(self.arbitrages_executed, 1))
         }
     
+    async def _update_price_feeds(self):
+        """Update real-time price feeds from multiple exchanges."""
+        try:
+            self.logger.debug("📊 Updating price feeds from exchanges...")
+            
+            # Simulate price feed updates with realistic market movements
+            for pair, feed_data in self.price_feeds.items():
+                # Simulate price volatility (±2% random movement)
+                current_price = feed_data["price"]
+                price_change = random.uniform(-0.02, 0.02)  # ±2% movement
+                new_price = current_price * Decimal(str(1 + price_change))
+                
+                # Update volume with some randomness
+                volume_change = random.uniform(-0.1, 0.1)  # ±10% volume change
+                new_volume = feed_data["volume"] * Decimal(str(1 + volume_change))
+                
+                # Update feed data
+                self.price_feeds[pair] = {
+                    "price": new_price,
+                    "volume": max(new_volume, Decimal("1000")),  # Minimum volume
+                    "last_updated": datetime.now().timestamp(),
+                    "price_change_24h": price_change,
+                    "bid": new_price * Decimal("0.999"),  # Bid slightly lower
+                    "ask": new_price * Decimal("1.001")   # Ask slightly higher
+                }
+                
+                self.logger.debug(f"📈 {pair}: ${new_price:.4f} ({price_change:+.2%})")
+            
+            # Add some new pairs occasionally
+            if random.random() < 0.1:  # 10% chance to add new pair
+                new_pairs = ["LINK/USDC", "MATIC/USDC", "AVAX/USDC", "DOT/USDC"]
+                for pair in new_pairs:
+                    if pair not in self.price_feeds:
+                        base_price = random.uniform(1, 100)
+                        self.price_feeds[pair] = {
+                            "price": Decimal(str(base_price)),
+                            "volume": Decimal(str(random.uniform(10000, 100000))),
+                            "last_updated": datetime.now().timestamp(),
+                            "price_change_24h": random.uniform(-0.05, 0.05),
+                            "bid": Decimal(str(base_price * 0.999)),
+                            "ask": Decimal(str(base_price * 1.001))
+                        }
+                        self.logger.debug(f"✨ Added new price feed: {pair}")
+                        break
+                        
+        except Exception as e:
+            self.logger.error(f"❌ Price feed update error: {e}")
+    
+    async def _detect_new_opportunities(self):
+        """Detect new arbitrage opportunities from current market conditions."""
+        try:
+            self.logger.debug("🔍 Detecting new arbitrage opportunities...")
+            
+            # Simulate opportunity detection across different exchanges
+            exchanges = list(self.exchange_connections.keys())
+            
+            for asset_pair in self.price_feeds.keys():
+                # Simulate price differences across exchanges
+                base_price = self.price_feeds[asset_pair]["price"]
+                
+                for i, exchange1 in enumerate(exchanges):
+                    for exchange2 in exchanges[i+1:]:
+                        # Simulate price spread between exchanges
+                        spread = random.uniform(0.001, 0.02)  # 0.1% to 2% spread
+                        
+                        if random.random() < 0.5:  # 50% chance exchange1 is cheaper
+                            buy_price = base_price * Decimal(str(1 - spread/2))
+                            sell_price = base_price * Decimal(str(1 + spread/2))
+                            buy_exchange = exchange1
+                            sell_exchange = exchange2
+                        else:
+                            buy_price = base_price * Decimal(str(1 + spread/2))
+                            sell_price = base_price * Decimal(str(1 - spread/2))
+                            buy_exchange = exchange2
+                            sell_exchange = exchange1
+                        
+                        # Only consider profitable opportunities
+                        price_diff = sell_price - buy_price
+                        if price_diff > buy_price * Decimal("0.002"):  # Min 0.2% profit
+                            
+                            required_capital = random.uniform(1000, 50000)
+                            gas_cost = random.uniform(30, 150)
+                            profit_potential = float(price_diff) * random.uniform(100, 1000) - gas_cost
+                            
+                            if profit_potential > 10:  # Min $10 profit
+                                opportunity_id = f"arb_{asset_pair.replace('/', '_')}_{int(datetime.now().timestamp())}"
+                                
+                                opportunity = ArbitrageOpportunity(
+                                    opportunity_id=opportunity_id,
+                                    arbitrage_type=ArbitrageType.SIMPLE_ARBITRAGE,
+                                    asset_symbol=asset_pair.split('/')[0],
+                                    buy_exchange=buy_exchange,
+                                    sell_exchange=sell_exchange,
+                                    buy_price=buy_price,
+                                    sell_price=sell_price,
+                                    price_difference=price_diff,
+                                    profit_potential=Decimal(str(profit_potential)),
+                                    required_capital=Decimal(str(required_capital)),
+                                    gas_cost=Decimal(str(gas_cost)),
+                                    slippage_estimate=Decimal(str(random.uniform(0.001, 0.01))),
+                                    execution_time=random.randint(15, 60),
+                                    confidence_score=random.uniform(0.7, 0.95),
+                                    liquidity_depth=Decimal(str(random.uniform(50000, 500000))),
+                                    market_impact=random.uniform(0.001, 0.05)
+                                )
+                                
+                                self.active_opportunities[opportunity_id] = opportunity
+                                self.opportunities_detected += 1
+                                
+                                self.logger.info(f"🎯 New arbitrage opportunity: {asset_pair} on {buy_exchange.value} -> {sell_exchange.value}, ${profit_potential:.2f} profit")
+                                
+                                # Limit opportunities to prevent spam
+                                if len(self.active_opportunities) > 20:
+                                    # Remove oldest opportunity
+                                    oldest_id = min(self.active_opportunities.keys())
+                                    del self.active_opportunities[oldest_id]
+                                    
+                                return  # Return after finding one opportunity
+            
+        except Exception as e:
+            self.logger.error(f"❌ Opportunity detection error: {e}")
+
+    async def _clean_expired_opportunities(self):
+        """Clean up expired arbitrage opportunities."""
+        try:
+            self.logger.debug("🧹 Cleaning expired arbitrage opportunities...")
+            
+            current_time = datetime.now()
+            expired_opportunities = []
+            
+            for opportunity_id, opportunity in self.active_opportunities.items():
+                # Check if opportunity is expired (older than 5 minutes)
+                opportunity_age = current_time.timestamp() - float(opportunity_id.split('_')[-1])
+                
+                if opportunity_age > 300:  # 5 minutes
+                    expired_opportunities.append(opportunity_id)
+                # Also check if profit potential is too low
+                elif opportunity.profit_potential < Decimal('5'):
+                    expired_opportunities.append(opportunity_id)
+            
+            # Remove expired opportunities
+            for opportunity_id in expired_opportunities:
+                del self.active_opportunities[opportunity_id]
+                self.logger.debug(f"🗑️ Removed expired opportunity: {opportunity_id}")
+            
+            if expired_opportunities:
+                self.logger.debug(f"🧹 Cleaned {len(expired_opportunities)} expired opportunities")
+                
+        except Exception as e:
+            self.logger.error(f"❌ Opportunity cleanup error: {e}")
+
     # Helper methods (mock implementations)
     
     async def _initialize_exchange_connections(self):

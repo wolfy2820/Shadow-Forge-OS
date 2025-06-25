@@ -473,4 +473,74 @@ class NarrativeWeaver:
             "temporal_complexity": 0.6
         }
     
+    async def _monitor_narrative_consistency(self):
+        """Monitor narrative consistency across story universes."""
+        try:
+            self.logger.debug("📊 Monitoring narrative consistency...")
+            
+            # Check consistency across all active universes
+            for universe_id, universe in self.active_universes.items():
+                consistency_issues = []
+                
+                # Check character consistency
+                for character_id, character_data in universe.character_network.items():
+                    if random.random() > 0.9:  # Simulate occasional consistency issue
+                        consistency_issues.append(f"Character {character_id} development inconsistency")
+                
+                # Check thematic consistency
+                if len(universe.thematic_threads) > 3 and random.random() > 0.8:
+                    consistency_issues.append("Thematic thread divergence detected")
+                
+                # Update consistency metrics
+                consistency_score = max(0.0, 1.0 - len(consistency_issues) * 0.1)
+                self.continuity_maintained = (self.continuity_maintained * 0.9 + consistency_score * 0.1)
+                
+                if consistency_issues:
+                    self.logger.warning(f"⚠️ Universe {universe_id}: {len(consistency_issues)} consistency issues")
+                else:
+                    self.logger.debug(f"✅ Universe {universe_id}: Narrative consistency maintained")
+                    
+        except Exception as e:
+            self.logger.error(f"❌ Narrative consistency monitoring error: {e}")
+    
+    async def _check_narrative_continuity(self):
+        """Check narrative continuity across story elements."""
+        try:
+            self.logger.debug("🔍 Checking narrative continuity...")
+            
+            # Validate continuity rules for each universe
+            for universe_id, universe in self.active_universes.items():
+                continuity_violations = []
+                
+                # Check temporal continuity
+                if universe.temporal_map:
+                    temporal_events = list(universe.temporal_map.keys())
+                    if len(temporal_events) > 1:
+                        # Check for temporal inconsistencies
+                        for i in range(len(temporal_events) - 1):
+                            if random.random() > 0.95:  # Simulate rare continuity violations
+                                continuity_violations.append(f"Temporal inconsistency between {temporal_events[i]} and {temporal_events[i+1]}")
+                
+                # Check character arc continuity
+                for node_id, node in universe.story_nodes.items():
+                    if node.character_development and random.random() > 0.92:
+                        continuity_violations.append(f"Character arc discontinuity in node {node_id}")
+                
+                # Update continuity score
+                continuity_score = max(0.0, 1.0 - len(continuity_violations) * 0.15)
+                
+                # Update audience retention based on continuity
+                self.audience_retention = (self.audience_retention * 0.95 + continuity_score * 0.05)
+                
+                if continuity_violations:
+                    self.logger.warning(f"🔴 Universe {universe_id}: {len(continuity_violations)} continuity violations")
+                    # Log first few violations for debugging
+                    for violation in continuity_violations[:3]:
+                        self.logger.debug(f"  - {violation}")
+                else:
+                    self.logger.debug(f"✅ Universe {universe_id}: Narrative continuity intact")
+                    
+        except Exception as e:
+            self.logger.error(f"❌ Narrative continuity check error: {e}")
+    
     # Additional helper methods would be implemented here...

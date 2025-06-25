@@ -530,6 +530,121 @@ class ProphetOrchestrator:
                 self.logger.error(f"❌ Performance monitoring error: {e}")
                 await asyncio.sleep(300)
     
+    async def _update_trend_predictions(self):
+        """Update and refresh trend predictions."""
+        try:
+            self.logger.debug("📊 Updating trend predictions...")
+            
+            # Update predictions from trend precognition engine
+            updated_predictions = await self.trend_precognition.predict_viral_trends(
+                time_horizon=self.prediction_horizon
+            )
+            
+            # Process and store updated predictions
+            for prediction in updated_predictions:
+                prediction_id = f"pred_{datetime.now().timestamp()}_{random.randint(1000, 9999)}"
+                self.active_predictions[prediction_id] = {
+                    "prediction": prediction,
+                    "confidence": random.uniform(0.6, 0.95),
+                    "updated_at": datetime.now().isoformat(),
+                    "status": "active"
+                }
+            
+            # Cleanup old predictions
+            cutoff_time = datetime.now() - timedelta(hours=self.prediction_horizon * 2)
+            self.active_predictions = {
+                k: v for k, v in self.active_predictions.items()
+                if datetime.fromisoformat(v["updated_at"].replace('Z', '+00:00').replace('+00:00', '')) > cutoff_time
+            }
+            
+            self.logger.debug(f"🎆 Trend predictions updated: {len(self.active_predictions)} active predictions")
+            
+        except Exception as e:
+            self.logger.error(f"❌ Trend prediction update error: {e}")
+    
+    async def _process_content_pipeline(self):
+        """Process content through the generation pipeline."""
+        try:
+            self.logger.debug("🎨 Processing content pipeline...")
+            
+            # Process items in pipeline
+            processed_items = []
+            for item in self.content_pipeline[:5]:  # Process up to 5 items at a time
+                try:
+                    # Simulate content processing
+                    processing_time = random.uniform(30, 180)  # 30 seconds to 3 minutes
+                    await asyncio.sleep(0.1)  # Brief async delay
+                    
+                    # Update item status
+                    item["status"] = "processed"
+                    item["processed_at"] = datetime.now().isoformat()
+                    item["quality_score"] = random.uniform(0.6, 0.95)
+                    item["viral_potential"] = random.uniform(0.4, 0.9)
+                    
+                    processed_items.append(item)
+                    
+                    # Check if content meets quality threshold
+                    if item["quality_score"] >= self.content_quality_threshold:
+                        self.logger.info(f"✅ High-quality content processed: {item.get('id', 'unknown')} (quality: {item['quality_score']:.2f})")
+                    
+                except Exception as item_error:
+                    self.logger.warning(f"⚠️ Content processing error for item {item.get('id', 'unknown')}: {item_error}")
+            
+            # Remove processed items from pipeline
+            self.content_pipeline = [item for item in self.content_pipeline if item not in processed_items]
+            
+            # Add processed items to performance history
+            self.performance_history.extend(processed_items)
+            
+            self.logger.debug(f"📊 Pipeline processed: {len(processed_items)} items, {len(self.content_pipeline)} remaining")
+            
+        except Exception as e:
+            self.logger.error(f"❌ Content pipeline processing error: {e}")
+    
+    async def _monitor_content_performance(self):
+        """Monitor performance of generated content."""
+        try:
+            self.logger.debug("📈 Monitoring content performance...")
+            
+            # Monitor recent content performance
+            recent_content = self.performance_history[-50:]  # Last 50 items
+            
+            if recent_content:
+                # Calculate performance metrics
+                total_quality = sum(item.get("quality_score", 0) for item in recent_content)
+                average_quality = total_quality / len(recent_content)
+                
+                viral_hits = sum(1 for item in recent_content 
+                               if item.get("viral_potential", 0) > self.viral_probability_threshold)
+                
+                # Update performance metrics
+                self.prediction_accuracy = average_quality * 0.8 + random.uniform(0.05, 0.15)
+                
+                # Simulate revenue calculation
+                estimated_revenue = viral_hits * random.uniform(1000, 5000)
+                self.revenue_generated += estimated_revenue
+                
+                # Check for viral hits
+                new_viral_hits = sum(1 for item in recent_content[-10:] 
+                                   if item.get("viral_potential", 0) > 0.85)
+                self.viral_hits_created += new_viral_hits
+                
+                if new_viral_hits > 0:
+                    self.logger.info(f"🚀 {new_viral_hits} new viral hits detected! Total revenue: ${self.revenue_generated:,.2f}")
+                
+                # Performance insights
+                performance_insights = {
+                    "average_quality": average_quality,
+                    "viral_hit_rate": viral_hits / len(recent_content) if recent_content else 0,
+                    "revenue_per_content": estimated_revenue / len(recent_content) if recent_content else 0,
+                    "trend_alignment": random.uniform(0.7, 0.95)
+                }
+                
+                self.logger.debug(f"📉 Performance metrics: Quality {average_quality:.2f}, Viral Rate {performance_insights['viral_hit_rate']:.1%}")
+                
+        except Exception as e:
+            self.logger.error(f"❌ Content performance monitoring error: {e}")
+    
     # Additional helper methods would be implemented here...
     
     async def _enable_production_prophet_features(self):

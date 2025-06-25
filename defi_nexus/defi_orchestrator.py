@@ -11,6 +11,7 @@ import asyncio
 import logging
 import json
 import numpy as np
+import random
 from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -107,6 +108,9 @@ class DeFiOrchestrator:
         self.manipulation_opportunities = 0
         self.mev_extracted = Decimal('0')
         self.flash_loan_profits = Decimal('0')
+        
+        # DeFi protocols (initialized here to avoid AttributeError)
+        self.defi_protocols = {}
         
         self.is_initialized = False
     
@@ -465,6 +469,268 @@ class DeFiOrchestrator:
             }
         }
     
+    async def _scan_profit_opportunities(self):
+        """Scan for profit opportunities across all DeFi protocols."""
+        try:
+            self.logger.debug("🔍 Scanning profit opportunities across DeFi protocols...")
+            
+            profit_opportunities = []
+            
+            # Scan yield farming opportunities
+            for protocol, config in self.defi_protocols.items():
+                if protocol in ["uniswap_v3", "curve", "balancer"]:
+                    # Liquidity provision opportunities
+                    apy = random.uniform(0.05, 0.35)
+                    tvl = config.get("tvl", config.get("total_liquidity", 1000000))
+                    
+                    opportunity = {
+                        "type": "liquidity_provision",
+                        "protocol": protocol,
+                        "apy": apy,
+                        "tvl": tvl,
+                        "risk_score": random.uniform(0.2, 0.8),
+                        "min_deposit": random.uniform(100, 10000),
+                        "lock_period": random.choice([None, 7, 30, 90]),
+                        "profit_potential": apy * random.uniform(10000, 100000),
+                        "gas_cost": random.uniform(50, 200)
+                    }
+                    profit_opportunities.append(opportunity)
+                    
+                elif protocol in ["aave", "compound"]:
+                    # Lending opportunities
+                    lending_apy = random.uniform(0.02, 0.15)
+                    borrowing_apy = random.uniform(0.05, 0.25)
+                    
+                    # Lending opportunity
+                    opportunity = {
+                        "type": "lending",
+                        "protocol": protocol,
+                        "apy": lending_apy,
+                        "tvl": config.get("total_supply", config.get("total_borrowed", 1000000)),
+                        "risk_score": random.uniform(0.1, 0.4),
+                        "min_deposit": random.uniform(50, 1000),
+                        "profit_potential": lending_apy * random.uniform(5000, 50000),
+                        "gas_cost": random.uniform(30, 100)
+                    }
+                    profit_opportunities.append(opportunity)
+                    
+                    # Potential leverage opportunity
+                    if borrowing_apy < lending_apy * 2:  # Only if leverage makes sense
+                        leverage_opportunity = {
+                            "type": "leverage_farming",
+                            "protocol": protocol,
+                            "apy": (lending_apy * 2) - borrowing_apy,  # Leveraged return
+                            "risk_score": random.uniform(0.6, 0.9),
+                            "min_deposit": random.uniform(1000, 10000),
+                            "profit_potential": ((lending_apy * 2) - borrowing_apy) * random.uniform(20000, 100000),
+                            "gas_cost": random.uniform(100, 300)
+                        }
+                        profit_opportunities.append(leverage_opportunity)
+            
+            # Sort by profit potential
+            profit_opportunities.sort(key=lambda x: x['profit_potential'], reverse=True)
+            
+            # Store top opportunities
+            self.profit_opportunities = profit_opportunities[:10]  # Keep top 10
+            
+            self.logger.debug(f"📊 Found {len(profit_opportunities)} profit opportunities")
+            
+            return profit_opportunities
+            
+        except Exception as e:
+            self.logger.error(f"❌ Profit scanning error: {e}")
+            return []
+    
+    async def _monitor_portfolio_risk(self):
+        """Monitor portfolio risk metrics and exposure levels."""
+        try:
+            self.logger.debug("🛡️ Monitoring portfolio risk metrics...")
+            
+            if not self.portfolio_positions:
+                self.risk_metrics = {
+                    "total_exposure": 0.0,
+                    "concentration_risk": 0.0,
+                    "liquidity_risk": 0.0,
+                    "smart_contract_risk": 0.0,
+                    "overall_risk_score": 0.0
+                }
+                return
+            
+            total_value = 0
+            protocol_exposure = {}
+            asset_exposure = {}
+            liquidity_scores = []
+            smart_contract_scores = []
+            
+            # Calculate exposures and risks
+            for position_id, position in self.portfolio_positions.items():
+                position_value = position.get('value', 0)
+                total_value += position_value
+                
+                # Protocol concentration
+                protocol = position.get('protocol', 'unknown')
+                protocol_exposure[protocol] = protocol_exposure.get(protocol, 0) + position_value
+                
+                # Asset concentration
+                asset = position.get('asset', 'unknown')
+                asset_exposure[asset] = asset_exposure.get(asset, 0) + position_value
+                
+                # Liquidity risk
+                liquidity_scores.append(position.get('liquidity_score', 0.5))
+                
+                # Smart contract risk
+                smart_contract_scores.append(position.get('smart_contract_risk', 0.3))
+            
+            # Calculate risk metrics
+            if total_value > 0:
+                # Concentration risk (Herfindahl index)
+                protocol_concentrations = [(exp/total_value)**2 for exp in protocol_exposure.values()]
+                concentration_risk = sum(protocol_concentrations)
+                
+                # Average liquidity risk
+                liquidity_risk = 1 - (sum(liquidity_scores) / len(liquidity_scores))
+                
+                # Average smart contract risk
+                smart_contract_risk = sum(smart_contract_scores) / len(smart_contract_scores)
+                
+                # Overall risk score
+                overall_risk = (concentration_risk * 0.3 + liquidity_risk * 0.4 + smart_contract_risk * 0.3)
+                
+                self.risk_metrics = {
+                    "total_exposure": total_value,
+                    "concentration_risk": concentration_risk,
+                    "liquidity_risk": liquidity_risk,
+                    "smart_contract_risk": smart_contract_risk,
+                    "overall_risk_score": overall_risk,
+                    "protocol_exposure": protocol_exposure,
+                    "asset_exposure": asset_exposure,
+                    "position_count": len(self.portfolio_positions)
+                }
+                
+                # Check for risk threshold breaches
+                if overall_risk > 0.8:
+                    self.logger.warning(f"⚠️ High portfolio risk detected: {overall_risk:.2f}")
+                elif concentration_risk > 0.6:
+                    self.logger.warning(f"⚠️ High concentration risk: {concentration_risk:.2f}")
+                elif liquidity_risk > 0.7:
+                    self.logger.warning(f"⚠️ High liquidity risk: {liquidity_risk:.2f}")
+                
+                self.logger.debug(f"📊 Portfolio risk: {overall_risk:.2f} (Concentration: {concentration_risk:.2f}, Liquidity: {liquidity_risk:.2f})")
+            
+        except Exception as e:
+            self.logger.error(f"❌ Portfolio risk monitoring error: {e}")
+    
+    async def _scan_price_discrepancies(self):
+        """Scan for price discrepancies across DeFi protocols and exchanges."""
+        try:
+            self.logger.debug("🔍 Scanning price discrepancies across protocols...")
+            
+            price_discrepancies = []
+            
+            # Mock price data for major tokens across different protocols
+            tokens = ["ETH", "BTC", "USDC", "USDT", "DAI", "LINK", "UNI"]
+            protocols = ["uniswap_v3", "sushiswap", "curve", "balancer", "1inch"]
+            
+            for token in tokens:
+                protocol_prices = {}
+                
+                # Generate realistic prices with small variations
+                base_price = {
+                    "ETH": 2500, "BTC": 45000, "USDC": 1.0, "USDT": 1.0, 
+                    "DAI": 1.0, "LINK": 15, "UNI": 8
+                }[token]
+                
+                for protocol in protocols:
+                    # Add random variation (±1%)
+                    price_variation = random.uniform(-0.01, 0.01)
+                    protocol_prices[protocol] = base_price * (1 + price_variation)
+                
+                # Find discrepancies
+                for i, protocol1 in enumerate(protocols):
+                    for protocol2 in protocols[i+1:]:
+                        price1 = protocol_prices[protocol1]
+                        price2 = protocol_prices[protocol2]
+                        
+                        price_diff = abs(price1 - price2)
+                        price_diff_pct = price_diff / min(price1, price2)
+                        
+                        # Only consider significant discrepancies (>0.3%)
+                        if price_diff_pct > 0.003:
+                            discrepancy = {
+                                "token": token,
+                                "protocol1": protocol1,
+                                "protocol2": protocol2,
+                                "price1": price1,
+                                "price2": price2,
+                                "price_difference": price_diff,
+                                "price_difference_pct": price_diff_pct,
+                                "arbitrage_potential": price_diff * random.uniform(100, 1000),
+                                "liquidity_depth": random.uniform(10000, 100000),
+                                "gas_cost_estimate": random.uniform(50, 200),
+                                "confidence": random.uniform(0.7, 0.95),
+                                "timestamp": datetime.now().isoformat()
+                            }
+                            price_discrepancies.append(discrepancy)
+            
+            # Sort by arbitrage potential
+            price_discrepancies.sort(key=lambda x: x['arbitrage_potential'], reverse=True)
+            
+            self.logger.debug(f"💰 Found {len(price_discrepancies)} price discrepancies")
+            
+            return price_discrepancies[:20]  # Return top 20
+            
+        except Exception as e:
+            self.logger.error(f"❌ Price discrepancy scanning error: {e}")
+            return []
+    
+    async def _scan_mev_opportunities(self):
+        """Scan for MEV (Maximal Extractable Value) opportunities."""
+        try:
+            self.logger.debug("⚡ Scanning MEV opportunities...")
+            
+            mev_opportunities = []
+            
+            # Simulate different types of MEV opportunities
+            mev_types = [
+                "sandwich_attack", "frontrunning", "backrunning", 
+                "liquidation", "arbitrage", "jit_liquidity"
+            ]
+            
+            for mev_type in mev_types:
+                # Simulate opportunity parameters
+                if random.random() < 0.3:  # 30% chance for each type
+                    opportunity = {
+                        "type": mev_type,
+                        "target_tx_hash": f"0x{''.join(random.choices('0123456789abcdef', k=64))}",
+                        "profit_potential": random.uniform(10, 500),
+                        "gas_cost": random.uniform(100, 300),
+                        "success_probability": random.uniform(0.6, 0.9),
+                        "execution_window": random.randint(1, 5),  # blocks
+                        "required_capital": random.uniform(1000, 50000),
+                        "risk_score": random.uniform(0.3, 0.8),
+                        "protocol": random.choice(["uniswap_v3", "aave", "compound"]),
+                        "asset": random.choice(["ETH", "USDC", "WBTC"]),
+                        "timestamp": datetime.now().isoformat()
+                    }
+                    
+                    # Only include profitable opportunities
+                    if opportunity["profit_potential"] > opportunity["gas_cost"]:
+                        mev_opportunities.append(opportunity)
+            
+            # Sort by net profit potential
+            mev_opportunities.sort(
+                key=lambda x: x['profit_potential'] - x['gas_cost'], 
+                reverse=True
+            )
+            
+            self.logger.debug(f"⚡ Found {len(mev_opportunities)} MEV opportunities")
+            
+            return mev_opportunities
+            
+        except Exception as e:
+            self.logger.error(f"❌ MEV opportunity scanning error: {e}")
+            return []
+
     # Helper methods (orchestration implementation)
     
     async def _load_defi_protocols(self):

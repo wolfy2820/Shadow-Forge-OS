@@ -339,6 +339,117 @@ class YieldOptimizer:
             "risk_adjusted_returns": await self._calculate_risk_adjusted_returns()
         }
     
+    async def _monitor_yield_opportunities(self):
+        """Monitor and update yield opportunities across protocols."""
+        try:
+            self.logger.debug("🔍 Monitoring yield opportunities across DeFi protocols...")
+            
+            # Simulate yield opportunity discovery
+            protocols = list(self.protocol_integrations.keys())
+            for protocol in protocols:
+                apy_range = self.protocol_integrations[protocol]["apy_range"]
+                current_apy = random.uniform(apy_range[0], apy_range[1])
+                
+                # Update opportunity if it doesn't exist or APY changed significantly
+                opportunity_id = f"{protocol}_yield_opportunity"
+                if (opportunity_id not in self.yield_opportunities or 
+                    abs(current_apy - self.yield_opportunities[opportunity_id].apy) > 0.01):
+                    
+                    self.yield_opportunities[opportunity_id] = YieldOpportunity(
+                        opportunity_id=opportunity_id,
+                        protocol=protocol,
+                        strategy=YieldStrategy.LIQUIDITY_PROVISION,
+                        asset_pair="ETH/USDC",
+                        apy=current_apy,
+                        tvl=random.uniform(1000000, 10000000),
+                        risk_level=random.choice(list(RiskLevel)),
+                        liquidity_requirement=random.uniform(1000, 50000),
+                        lock_period=random.choice([None, 7, 30, 90]),
+                        impermanent_loss_risk=random.uniform(0.0, 0.05),
+                        smart_contract_risk=random.uniform(0.001, 0.02),
+                        gas_cost=random.uniform(20, 100),
+                        entry_threshold=random.uniform(100, 10000),
+                        exit_strategy="flexible"
+                    )
+                    
+                    self.logger.debug(f"📊 Updated {protocol} yield opportunity: {current_apy:.2%} APY")
+            
+            self.opportunities_analyzed += len(protocols)
+            
+        except Exception as e:
+            self.logger.error(f"❌ Yield monitoring error: {e}")
+    
+    async def _check_rebalancing_triggers(self):
+        """Check if portfolio rebalancing is needed based on market conditions."""
+        try:
+            self.logger.debug("⚖️ Checking rebalancing triggers...")
+            
+            if not self.active_positions:
+                return
+            
+            # Simulate rebalancing trigger checks
+            for position_id, position in self.active_positions.items():
+                # Check APY deviation
+                current_apy = random.uniform(0.05, 0.25)
+                expected_apy = position.get('expected_returns', {}).get('projected_apy', 0.1)
+                apy_deviation = abs(current_apy - expected_apy) / expected_apy
+                
+                # Check risk metrics
+                current_risk = random.uniform(0.1, 0.9)
+                risk_threshold = 0.7
+                
+                # Check liquidity needs
+                liquidity_ratio = random.uniform(0.05, 0.3)
+                min_liquidity = 0.1
+                
+                # Trigger rebalancing if needed
+                if (apy_deviation > 0.15 or  # 15% APY deviation
+                    current_risk > risk_threshold or  # High risk
+                    liquidity_ratio < min_liquidity):  # Low liquidity
+                    
+                    rebalance_reason = []
+                    if apy_deviation > 0.15:
+                        rebalance_reason.append(f"APY deviation: {apy_deviation:.2%}")
+                    if current_risk > risk_threshold:
+                        rebalance_reason.append(f"High risk: {current_risk:.2f}")
+                    if liquidity_ratio < min_liquidity:
+                        rebalance_reason.append(f"Low liquidity: {liquidity_ratio:.2%}")
+                    
+                    self.logger.info(f"🔄 Rebalancing triggered for {position_id}: {', '.join(rebalance_reason)}")
+                    
+                    # Execute rebalancing
+                    await self.rebalance_positions({
+                        "position_id": position_id,
+                        "trigger_reasons": rebalance_reason,
+                        "current_apy": current_apy,
+                        "current_risk": current_risk,
+                        "liquidity_ratio": liquidity_ratio
+                    })
+                    
+                    break  # Only rebalance one position per check
+            
+        except Exception as e:
+            self.logger.error(f"❌ Rebalancing trigger check error: {e}")
+
+    async def _update_apy_predictions(self):
+        """Update APY predictions for all tracked opportunities."""
+        try:
+            self.logger.debug("🔮 Updating APY predictions...")
+            
+            for opportunity_id, opportunity in self.yield_opportunities.items():
+                # Simulate APY prediction updates
+                current_apy = opportunity.apy
+                predicted_change = random.uniform(-0.02, 0.02)  # ±2% change
+                new_predicted_apy = max(0.001, current_apy + predicted_change)  # Min 0.1% APY
+                
+                # Update the opportunity with new prediction
+                opportunity.apy = new_predicted_apy
+                
+                self.logger.debug(f"📊 {opportunity_id}: APY prediction updated to {new_predicted_apy:.2%}")
+                
+        except Exception as e:
+            self.logger.error(f"❌ APY prediction update error: {e}")
+
     # Helper methods (mock implementations)
     
     async def _load_protocol_integrations(self):

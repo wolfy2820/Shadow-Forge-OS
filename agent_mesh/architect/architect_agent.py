@@ -196,6 +196,7 @@ class ArchitectAgent:
         self.system_graph = nx.DiGraph()
         self.component_registry: Dict[str, Dict] = {}
         self.integration_patterns: Dict[str, List] = {}
+        self.managed_components: List[str] = []
         
         # Tools
         self.tools = [

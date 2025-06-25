@@ -431,4 +431,56 @@ class MemeticEngineering:
         """Determine optimal meme type based on analysis."""
         return MemeType.HYBRID_MEME
     
+    async def _monitor_meme_propagation(self):
+        """Monitor meme propagation across networks."""
+        try:
+            self.logger.debug("📊 Monitoring meme propagation...")
+            
+            # Track active memes
+            for meme_id, meme in self.active_memes.items():
+                # Simulate propagation metrics
+                propagation_rate = random.uniform(0.1, meme.virality_coefficient)
+                spread_reach = int(propagation_rate * 1000000)  # Simulated reach
+                
+                self.logger.debug(f"🌊 Meme {meme_id}: {spread_reach:,} reach, {propagation_rate:.2f} propagation rate")
+                
+                # Update successful spreads counter
+                if propagation_rate > self.viral_probability_threshold:
+                    self.successful_spreads += 1
+                    
+                # Update average virality
+                self.average_virality = (self.average_virality * 0.9 + propagation_rate * 0.1)
+                
+        except Exception as e:
+            self.logger.error(f"❌ Meme propagation monitoring error: {e}")
+    
+    async def _track_meme_evolution(self):
+        """Track evolution of memes over time."""
+        try:
+            self.logger.debug("🧬 Tracking meme evolution...")
+            
+            # Simulate evolution tracking
+            for meme_id, meme in self.active_memes.items():
+                # Track mutations
+                mutation_occurred = random.random() < meme.mutation_rate
+                if mutation_occurred:
+                    # Record evolution event
+                    evolution_event = {
+                        "meme_id": meme_id,
+                        "mutation_type": random.choice(["amplification", "adaptation", "hybridization"]),
+                        "fitness_change": random.uniform(-0.1, 0.2),
+                        "timestamp": datetime.now().isoformat()
+                    }
+                    
+                    self.evolution_histories.append(evolution_event)
+                    
+                    # Update meme properties based on evolution
+                    if evolution_event["fitness_change"] > 0:
+                        meme.virality_coefficient = min(1.0, meme.virality_coefficient + evolution_event["fitness_change"])
+                        
+                    self.logger.debug(f"🔄 Meme {meme_id} evolved: {evolution_event['mutation_type']}")
+                    
+        except Exception as e:
+            self.logger.error(f"❌ Meme evolution tracking error: {e}")
+    
     # Additional helper methods would be implemented here...

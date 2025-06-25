@@ -411,7 +411,7 @@ class MemoryPalace:
             self.logger.error(f"❌ Memory compression failed: {e}")
             return {"compressed": 0, "space_saved": 0}
     
-    async def _get_memories_for_pattern_analysis(self) -> List[Dict[str, Any]]:
+    async def _get_memories_for_pattern_analysis(self, memory_type: MemoryType = None, timeframe: timedelta = None) -> List[Dict[str, Any]]:
         """Get memories formatted for pattern analysis."""
         try:
             analysis_memories = []

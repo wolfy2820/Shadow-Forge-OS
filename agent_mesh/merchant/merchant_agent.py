@@ -507,6 +507,34 @@ class MerchantAgent:
                 self.logger.error(f"❌ Revenue monitoring error: {e}")
                 await asyncio.sleep(3600)
     
+    async def _update_revenue_metrics(self):
+        """Update revenue metrics and tracking data."""
+        try:
+            # Simulate revenue data collection
+            current_time = datetime.now()
+            
+            # Update revenue streams with simulated growth
+            for stream in self.revenue_streams:
+                growth_factor = 1.02  # 2% growth simulation
+                self.revenue_streams[stream] *= growth_factor
+            
+            # Update customer metrics
+            for segment in self.customer_segments:
+                segment_data = self.customer_segments[segment]
+                segment_data["size"] = int(segment_data["size"] * 1.01)  # 1% customer growth
+            
+            # Update revenue metrics
+            total_revenue = sum(self.revenue_streams.values())
+            if hasattr(self, 'revenue_metrics'):
+                self.revenue_metrics.total_revenue = total_revenue
+                self.revenue_metrics.growth_rate = 0.15 + (total_revenue % 1000) / 10000  # Variable growth
+            
+            # Log updated metrics
+            self.logger.debug(f"💰 Revenue metrics updated: ${total_revenue:,.2f} total revenue")
+            
+        except Exception as e:
+            self.logger.error(f"❌ Revenue metrics update failed: {e}")
+
     async def _analyze_revenue_performance(self, metrics) -> Dict[str, Any]:
         """Analyze current revenue performance."""
         return {

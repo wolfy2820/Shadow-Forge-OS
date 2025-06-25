@@ -561,4 +561,81 @@ class GuardianAgent:
         total_threats = sum(len(threats) for threats in threat_lists)
         return max(0.0, 1.0 - (total_threats * 0.1))
     
+    async def _continuous_threat_monitoring(self):
+        """Perform continuous threat monitoring."""
+        try:
+            # Scan for new threats
+            threats = await self._scan_vulnerabilities("realtime")
+            
+            # Process and log threats
+            for threat in threats:
+                threat_id = f"threat_{datetime.now().timestamp()}"
+                self.active_threats[threat_id] = SecurityThreat(
+                    threat_id=threat_id,
+                    threat_type=threat.get("type", "unknown"),
+                    severity=ThreatLevel.MEDIUM,
+                    source=threat.get("source", "unknown"),
+                    target=threat.get("location", "unknown"),
+                    description=str(threat),
+                    mitigation_actions=[],
+                    detected_at=datetime.now(),
+                    resolved=False
+                )
+            
+            # Auto-respond to high-severity threats
+            for threat in self.active_threats.values():
+                if threat.severity in [ThreatLevel.HIGH, ThreatLevel.CRITICAL] and not threat.resolved:
+                    await self._auto_respond_to_threat(threat)
+                    
+            self.logger.debug(f"🔍 Continuous monitoring: {len(threats)} threats detected")
+            
+        except Exception as e:
+            self.logger.error(f"❌ Continuous threat monitoring failed: {e}")
+    
+    async def _perform_compliance_checks(self):
+        """Perform compliance checks against security policies."""
+        try:
+            compliance_results = {}
+            
+            # Check each security policy
+            for policy_type in SecurityPolicy:
+                policy_config = self.security_policies.get(policy_type, {})
+                
+                # Mock compliance check
+                compliance_score = 0.9 + (len(str(policy_type)) % 10) * 0.01
+                compliance_results[policy_type.value] = {
+                    "score": compliance_score,
+                    "violations": [],
+                    "status": "compliant" if compliance_score >= 0.8 else "non_compliant"
+                }
+            
+            # Update compliance status
+            self.compliance_status.update({
+                policy.value: result["score"] 
+                for policy, result in zip(SecurityPolicy, compliance_results.values())
+            })
+            
+            self.compliance_checks_performed += 1
+            self.logger.debug(f"✅ Compliance checks completed: {len(compliance_results)} policies checked")
+            
+        except Exception as e:
+            self.logger.error(f"❌ Compliance checks failed: {e}")
+    
+    async def _auto_respond_to_threat(self, threat: SecurityThreat):
+        """Automatically respond to detected threat."""
+        try:
+            if self.auto_response_enabled:
+                # Implement containment actions based on threat type
+                if "access" in threat.threat_type:
+                    self.blocked_entities.add(threat.source)
+                
+                # Mark threat as being handled
+                threat.mitigation_actions.append(f"auto_response_initiated_{datetime.now().isoformat()}")
+                
+                self.threats_mitigated += 1
+                self.logger.info(f"🤖 Auto-response initiated for threat: {threat.threat_id}")
+                
+        except Exception as e:
+            self.logger.error(f"❌ Auto-response failed for threat {threat.threat_id}: {e}")
+    
     # Additional helper methods would be implemented here...

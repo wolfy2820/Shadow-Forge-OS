@@ -48,6 +48,20 @@ class UserProfile:
     satisfaction_score: float
     relationship_status: str
 
+@dataclass
+class StakeholderRelationship:
+    """Stakeholder relationship data."""
+    stakeholder_id: str
+    name: str
+    role: str
+    relationship_strength: float
+    trust_level: float
+    satisfaction_score: float
+    last_interaction: datetime
+    interaction_count: int
+    communication_preferences: Dict[str, Any]
+    recent_feedback: List[Dict[str, Any]]
+
 class CommunicationAnalyzerTool(BaseTool):
     """Tool for analyzing communication patterns and optimizing interactions."""
     
@@ -209,6 +223,8 @@ class DiplomatAgent:
         self.active_conversations: Dict[str, Dict[str, Any]] = {}
         self.communication_templates: Dict[CommunicationMode, str] = {}
         self.relationship_metrics: Dict[str, float] = {}
+        self.stakeholder_relationships: Dict[str, StakeholderRelationship] = {}
+        self.communication_priorities: Dict[str, Dict[str, Any]] = {}
         
         # Negotiation and conflict resolution
         self.active_negotiations: Dict[str, Dict[str, Any]] = {}
@@ -572,5 +588,80 @@ class DiplomatAgent:
             except Exception as e:
                 self.logger.error(f"❌ Relationship monitoring error: {e}")
                 await asyncio.sleep(1800)
+    
+    async def _monitor_relationship_health(self):
+        """Monitor health of all stakeholder relationships."""
+        try:
+            current_time = datetime.now()
+            
+            # Check each stakeholder relationship
+            for stakeholder_id, stakeholder in self.stakeholder_relationships.items():
+                # Calculate relationship health score
+                days_since_last_interaction = (current_time - stakeholder.last_interaction).days
+                interaction_frequency = stakeholder.interaction_count / max(1, days_since_last_interaction)
+                
+                # Update relationship health based on recent interactions
+                if days_since_last_interaction > 7:  # More than a week
+                    stakeholder.relationship_strength = max(0.1, stakeholder.relationship_strength - 0.05)
+                else:
+                    stakeholder.relationship_strength = min(1.0, stakeholder.relationship_strength + 0.02)
+                
+                # Update trust level based on satisfaction
+                if stakeholder.satisfaction_score > 0.8:
+                    stakeholder.trust_level = min(1.0, stakeholder.trust_level + 0.01)
+                elif stakeholder.satisfaction_score < 0.5:
+                    stakeholder.trust_level = max(0.0, stakeholder.trust_level - 0.02)
+                
+                # Identify relationship risks
+                if stakeholder.relationship_strength < 0.5 or stakeholder.trust_level < 0.6:
+                    self.logger.warning(f"⚠️ Relationship risk detected with {stakeholder_id}")
+                    
+                    # Add to communication priorities for attention
+                    if stakeholder_id not in self.communication_priorities:
+                        self.communication_priorities[stakeholder_id] = {
+                            "priority": "high",
+                            "reason": "relationship_health_decline",
+                            "recommended_action": "proactive_engagement"
+                        }
+            
+            # Update overall relationship metrics
+            total_relationships = len(self.stakeholder_relationships)
+            if total_relationships > 0:
+                avg_relationship_strength = sum(
+                    s.relationship_strength for s in self.stakeholder_relationships.values()
+                ) / total_relationships
+                
+                avg_trust_level = sum(
+                    s.trust_level for s in self.stakeholder_relationships.values()
+                ) / total_relationships
+                
+                self.logger.debug(f"🤝 Relationship health: {avg_relationship_strength:.2f} strength, {avg_trust_level:.2f} trust")
+            
+        except Exception as e:
+            self.logger.error(f"❌ Relationship health monitoring failed: {e}")
+    
+    async def _update_satisfaction_metrics(self):
+        """Update satisfaction metrics for all stakeholders."""
+        try:
+            for stakeholder_id, stakeholder in self.stakeholder_relationships.items():
+                # Simulate satisfaction updates based on recent interactions
+                if hasattr(stakeholder, 'recent_feedback'):
+                    # Update based on feedback
+                    positive_feedback = sum(1 for f in stakeholder.recent_feedback if f.get('rating', 0) > 3)
+                    total_feedback = len(stakeholder.recent_feedback)
+                    
+                    if total_feedback > 0:
+                        satisfaction_from_feedback = positive_feedback / total_feedback
+                        stakeholder.satisfaction_score = (
+                            stakeholder.satisfaction_score * 0.7 + satisfaction_from_feedback * 0.3
+                        )
+                else:
+                    # Gradual satisfaction decay without feedback
+                    stakeholder.satisfaction_score = max(0.3, stakeholder.satisfaction_score * 0.99)
+                
+            self.logger.debug("📊 Satisfaction metrics updated for all stakeholders")
+            
+        except Exception as e:
+            self.logger.error(f"❌ Satisfaction metrics update failed: {e}")
     
     # Additional helper methods would be implemented here...
