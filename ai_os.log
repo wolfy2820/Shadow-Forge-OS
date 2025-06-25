@@ -1,0 +1,86 @@
+2025-06-23 23:05:10,941 - ShadowForgeAIOS - INFO - 🚀 Initializing ShadowForge AI Operating System...
+2025-06-23 23:05:10,941 - BrowserControl - INFO - 🌐 Browser initialized (mock mode)
+2025-06-23 23:05:10,941 - CryptoWallet - INFO - 💰 Demo wallet initialized with $100.00
+2025-06-23 23:05:10,941 - AIModelInterface - INFO - 🧠 AI Models initialized (mock mode)
+2025-06-23 23:05:10,941 - AIModelInterface - INFO - ℹ️ Running in demo mode - add API keys for real AI responses
+2025-06-23 23:05:10,941 - BusinessAutomation - INFO - 📊 Market intelligence initialized
+2025-06-23 23:05:10,941 - BusinessAutomation - INFO - 🏢 Business automation initialized
+2025-06-23 23:05:10,942 - ShadowForgeAIOS - INFO - ✅ ShadowForge AI OS initialized successfully
+2025-06-23 23:05:10,944 - WebServer - INFO - 🌐 Web server running at http://localhost:8080
+2025-06-23 23:09:52,051 - ShadowForgeAIOS - INFO - 🚀 Initializing ShadowForge AI Operating System...
+2025-06-23 23:09:52,051 - BrowserControl - INFO - 🌐 Browser initialized (mock mode)
+2025-06-23 23:09:52,052 - CryptoWallet - INFO - 💰 Demo wallet initialized with $100.00
+2025-06-23 23:09:52,052 - AIModelInterface - INFO - 🧠 AI Models initialized (mock mode)
+2025-06-23 23:09:52,052 - AIModelInterface - INFO - ℹ️ Running in demo mode - add API keys for real AI responses
+2025-06-23 23:09:52,052 - BusinessAutomation - INFO - 📊 Market intelligence initialized
+2025-06-23 23:09:52,052 - BusinessAutomation - INFO - 🏢 Business automation initialized
+2025-06-23 23:09:52,052 - ShadowForgeAIOS - INFO - ✅ ShadowForge AI OS initialized successfully
+2025-06-23 23:09:52,053 - ShadowForgeAIOS - INFO - 🗣️ Processing: create business: AI writing assistant
+2025-06-23 23:09:52,053 - BusinessAutomation - INFO - 🏗️ Creating business: i writing ssistnt
+2025-06-23 23:09:52,056 - BusinessAutomation - INFO - 🚀 Development started for IWritingTools
+2025-06-23 23:09:52,056 - CryptoWallet - INFO - 💸 Payment sent: $20.00 to dev_team... - Development payment for IWritingTools
+2025-06-23 23:09:52,057 - BusinessAutomation - INFO - ✅ Business created: IWritingTools (5d5e433a)
+2025-06-23 23:09:52,059 - WebServer - INFO - 🌐 Web server running at http://localhost:8080
+2025-06-23 23:09:53,059 - ShadowForgeAIOS - INFO - 🗣️ Processing: create business: Social media scheduler
+2025-06-23 23:09:53,059 - BusinessAutomation - INFO - 🏗️ Creating business: socil medi scheduler
+2025-06-23 23:09:53,059 - BusinessAutomation - INFO - 🚀 Development started for SocilMediSuite
+2025-06-23 23:09:53,059 - CryptoWallet - INFO - 💸 Payment sent: $20.00 to dev_team... - Development payment for SocilMediSuite
+2025-06-23 23:09:53,059 - BusinessAutomation - INFO - ✅ Business created: SocilMediSuite (7eae8222)
+2025-06-23 23:09:54,060 - ShadowForgeAIOS - INFO - 🗣️ Processing: create business: No-code website builder
+2025-06-23 23:09:54,061 - BusinessAutomation - INFO - 🏗️ Creating business: no-code website builder
+2025-06-23 23:09:54,061 - BusinessAutomation - INFO - 🚀 Development started for No-CodeWebsiteTools
+2025-06-23 23:09:54,061 - CryptoWallet - INFO - 💸 Payment sent: $20.00 to dev_team... - Development payment for No-CodeWebsiteTools
+2025-06-23 23:09:54,061 - BusinessAutomation - INFO - ✅ Business created: No-CodeWebsiteTools (435dee36)
+2025-06-23 23:10:52,093 - BusinessAutomation - INFO - 🎉 Business launched: IWritingTools
+2025-06-23 23:10:52,093 - BusinessAutomation - INFO - 🎉 Business launched: SocilMediSuite
+2025-06-23 23:10:52,093 - BusinessAutomation - INFO - 🎉 Business launched: No-CodeWebsiteTools
+2025-06-23 23:11:02,101 - BusinessAutomation - INFO - 💰 SocilMediSuite: +$783.05 revenue (+$78.30 crypto)
+2025-06-23 23:11:12,109 - BusinessAutomation - INFO - 💰 SocilMediSuite: +$590.93 revenue (+$59.09 crypto)
+2025-06-23 23:11:22,111 - BusinessAutomation - INFO - 💰 SocilMediSuite: +$1013.65 revenue (+$101.36 crypto)
+2025-06-23 23:11:32,118 - BusinessAutomation - INFO - 💰 IWritingTools: +$1347.81 revenue (+$134.78 crypto)
+2025-06-23 23:11:32,119 - BusinessAutomation - INFO - 💰 SocilMediSuite: +$954.25 revenue (+$95.43 crypto)
+2025-06-23 23:14:29,830 - ShadowForgeAIOS - INFO - 🚀 Initializing ShadowForge AI Operating System...
+2025-06-23 23:14:29,830 - BrowserControl - INFO - 🌐 Browser initialized (mock mode)
+2025-06-23 23:14:29,830 - CryptoWallet - INFO - 💰 Demo wallet initialized with $100.00
+2025-06-23 23:14:29,830 - AIModelInterface - INFO - 🧠 AI Models initialized (mock mode)
+2025-06-23 23:14:29,830 - AIModelInterface - INFO - ℹ️ Running in demo mode - add API keys for real AI responses
+2025-06-23 23:14:29,830 - BusinessAutomation - INFO - 📊 Market intelligence initialized
+2025-06-23 23:14:29,830 - BusinessAutomation - INFO - 🏢 Business automation initialized
+2025-06-23 23:14:29,831 - ShadowForgeAIOS - INFO - ✅ ShadowForge AI OS initialized successfully
+2025-06-23 23:14:29,833 - WebServer - INFO - 🌐 Web server running at http://localhost:8080
+2025-06-23 23:15:16,759 - ShadowForgeAIOS - INFO - 🗣️ Processing: hello
+2025-06-23 23:15:19,454 - ShadowForgeAIOS - INFO - 🗣️ Processing: g
+2025-06-23 23:15:20,705 - ShadowForgeAIOS - INFO - 🗣️ Processing: h
+2025-06-23 23:15:21,430 - ShadowForgeAIOS - INFO - 🗣️ Processing: k
+2025-06-23 23:15:28,711 - ShadowForgeAIOS - INFO - 🗣️ Processing: 5
+2025-06-23 23:16:00,461 - ShadowForgeAIOS - INFO - 🚀 Initializing ShadowForge AI Operating System...
+2025-06-23 23:16:00,461 - BrowserControl - INFO - 🌐 Browser initialized (mock mode)
+2025-06-23 23:16:00,461 - CryptoWallet - INFO - 💰 Demo wallet initialized with $100.00
+2025-06-23 23:16:00,461 - AIModelInterface - INFO - 🧠 AI Models initialized (mock mode)
+2025-06-23 23:16:00,461 - AIModelInterface - INFO - ℹ️ Running in demo mode - add API keys for real AI responses
+2025-06-23 23:16:00,461 - BusinessAutomation - INFO - 📊 Market intelligence initialized
+2025-06-23 23:16:00,461 - BusinessAutomation - INFO - 🏢 Business automation initialized
+2025-06-23 23:16:00,462 - ShadowForgeAIOS - INFO - ✅ ShadowForge AI OS initialized successfully
+2025-06-23 23:16:00,464 - WebServer - ERROR - Web server error: [Errno 98] Address already in use
+2025-06-23 23:16:04,935 - ShadowForgeAIOS - INFO - 🗣️ Processing: ok
+2025-06-23 23:17:00,261 - ShadowForgeAIOS - INFO - 🚀 Initializing ShadowForge AI Operating System...
+2025-06-23 23:17:00,261 - BrowserControl - INFO - 🌐 Browser initialized (mock mode)
+2025-06-23 23:17:00,261 - CryptoWallet - INFO - 💰 Demo wallet initialized with $100.00
+2025-06-23 23:17:00,261 - AIModelInterface - INFO - 🧠 AI Models initialized (mock mode)
+2025-06-23 23:17:00,261 - AIModelInterface - INFO - ℹ️ Running in demo mode - add API keys for real AI responses
+2025-06-23 23:17:00,261 - BusinessAutomation - INFO - 📊 Market intelligence initialized
+2025-06-23 23:17:00,261 - BusinessAutomation - INFO - 🏢 Business automation initialized
+2025-06-23 23:17:00,262 - ShadowForgeAIOS - INFO - ✅ ShadowForge AI OS initialized successfully
+2025-06-23 23:17:00,264 - WebServer - INFO - 🌐 Web server running at http://localhost:8080
+2025-06-23 23:17:18,775 - ShadowForgeAIOS - INFO - 🗣️ Processing: 'create business: AI writing assistant'
+2025-06-23 23:17:18,775 - BusinessAutomation - INFO - 🏗️ Creating business: '  i writing ssistnt'
+2025-06-23 23:17:18,775 - BusinessAutomation - INFO - 🚀 Development started for 'IHub
+2025-06-23 23:17:18,776 - CryptoWallet - INFO - 💸 Payment sent: $20.00 to dev_team... - Development payment for 'IHub
+2025-06-23 23:17:18,776 - BusinessAutomation - INFO - ✅ Business created: 'IHub (51dbacb1)
+2025-06-23 23:17:24,302 - ShadowForgeAIOS - INFO - 🗣️ Processing: fff
+2025-06-23 23:17:40,880 - ShadowForgeAIOS - INFO - 🗣️ Processing: check wallet balance
+2025-06-23 23:17:55,442 - ShadowForgeAIOS - INFO - 🗣️ Processing: research market
+2025-06-23 23:17:55,442 - BrowserControl - INFO - 🌐 Navigating to: https://trends.google.com - Purpose: Business intelligence gathering
+2025-06-23 23:18:05,650 - ShadowForgeAIOS - INFO - 🗣️ Processing: research market trends
+2025-06-23 23:18:05,650 - BrowserControl - INFO - 🌐 Navigating to: https://trends.google.com - Purpose: Business intelligence gathering
+2025-06-23 23:18:16,747 - ShadowForgeAIOS - INFO - 🗣️ Processing: show system status

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShadowForge AI Operating System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem 2rem;
+            border-bottom: 2px solid #00ff88;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header h1 {
+            color: #00ff88;
+            font-size: 2rem;
+            text-shadow: 0 0 10px #00ff88;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .panel {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 1rem;
+            backdrop-filter: blur(5px);
+        }
+        
+        .panel h2 {
+            color: #00ff88;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            border-bottom: 1px solid #333;
+            padding-bottom: 0.5rem;
+        }
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .metric {
+            background: rgba(0, 255, 136, 0.1);
+            padding: 0.5rem;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #00ff88;
+        }
+        
+        .metric-label {
+            font-size: 0.8rem;
+            color: #ccc;
+        }
+        
+        .business-item {
+            background: rgba(0, 255, 136, 0.1);
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 5px;
+            border-left: 3px solid #00ff88;
+        }
+        
+        .business-name {
+            color: #00ff88;
+            font-weight: bold;
+        }
+        
+        .business-stats {
+            color: #ccc;
+            font-size: 0.8rem;
+            margin-top: 0.2rem;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        .status-active { background: #00ff88; }
+        .status-development { background: #ffaa00; }
+        .status-planning { background: #888; }
+        
+        .live-stats {
+            grid-column: 1 / 3;
+            text-align: center;
+        }
+        
+        .empire-value {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #00ff88;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            margin: 1rem 0;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .live-indicator {
+            animation: pulse 2s infinite;
+            color: #00ff88;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🤖 ShadowForge AI Operating System</h1>
+        <p>Autonomous Business Creation & Management Platform</p>
+    </div>
+    
+    <div class="container">
+        <div class="panel">
+            <h2>📊 System Metrics</h2>
+            <div class="metric-grid">
+                <div class="metric">
+                    <div class="metric-value" id="uptime">00:00:00</div>
+                    <div class="metric-label">Uptime</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="businesses">0</div>
+                    <div class="metric-label">Active Businesses</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="wallet">$0.00</div>
+                    <div class="metric-label">Wallet Balance</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="commands">0</div>
+                    <div class="metric-label">Commands Processed</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <h2>🏢 Business Portfolio</h2>
+            <div id="businessList">
+                <div style="color: #888; text-align: center; padding: 2rem;">
+                    No businesses created yet
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel live-stats">
+            <h2><span class="live-indicator">🔴 LIVE</span> Empire Valuation</h2>
+            <div class="empire-value" id="empireValue">$0</div>
+            <div style="color: #ccc;">Total Revenue Generated</div>
+        </div>
+    </div>
+
+    <script>
+        function updateStats() {
+            fetch('/api/status')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('uptime').textContent = data.uptime || '00:00:00';
+                    document.getElementById('commands').textContent = data.session_stats?.commands_processed || 0;
+                    document.getElementById('wallet').textContent = '$' + (data.developer_panel?.system_health?.wallet_balance || 0).toFixed(2);
+                })
+                .catch(error => console.log('Status update failed:', error));
+            
+            fetch('/api/businesses')
+                .then(response => response.json())
+                .then(businesses => {
+                    document.getElementById('businesses').textContent = businesses.length;
+                    
+                    const totalRevenue = businesses.reduce((sum, b) => sum + (b.total_revenue || 0), 0);
+                    document.getElementById('empireValue').textContent = '$' + totalRevenue.toLocaleString();
+                    
+                    const listElement = document.getElementById('businessList');
+                    
+                    if (businesses.length === 0) {
+                        listElement.innerHTML = '<div style="color: #888; text-align: center; padding: 2rem;">No businesses created yet</div>';
+                    } else {
+                        listElement.innerHTML = businesses.map(business => {
+                            const statusClass = business.status === 'launched' ? 'status-active' : 
+                                              business.status === 'development' ? 'status-development' : 'status-planning';
+                            
+                            return `
+                                <div class="business-item">
+                                    <div class="business-name">
+                                        <span class="status-indicator ${statusClass}"></span>
+                                        ${business.name}
+                                    </div>
+                                    <div class="business-stats">
+                                        Status: ${business.status} | 
+                                        Revenue: $${(business.total_revenue || 0).toFixed(2)} |
+                                        Progress: ${(business.development_progress || 0).toFixed(1)}%
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                })
+                .catch(error => console.log('Business update failed:', error));
+        }
+        
+        // Update every 5 seconds
+        setInterval(updateStats, 5000);
+        updateStats(); // Initial load
+    </script>
+</body>
+</html>
