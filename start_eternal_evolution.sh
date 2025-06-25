@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# ShadowForge OS v5.1 - Eternal Evolution Starter
+# Quick script to activate autonomous AI collaboration
+
+echo "🌌 SHADOWFORGE OS - ETERNAL EVOLUTION PROTOCOL"
+echo "=============================================="
+echo ""
+echo "📋 TASK.md has been created with complete autonomous mandate"
+echo "🤖 Jules and Codex now have unlimited authority to evolve the platform"
+echo ""
+echo "🎯 TO ACTIVATE AI COLLABORATION:"
+echo "   1. Tell Jules: 'Read TASK.md and begin eternal evolution protocol'"
+echo "   2. Tell Codex: 'Read TASK.md and start autonomous implementation'"
+echo "   3. Both agents will work forever to improve ShadowForge OS"
+echo ""
+echo "📊 MONITOR PROGRESS:"
+echo "   - Check TASK.md for agent activity logs"
+echo "   - Watch git commits for continuous improvements"
+echo "   - Review system performance metrics"
+echo ""
+echo "🚀 CURRENT STATUS:"
+echo "   ✅ Master protocol document created"
+echo "   ✅ Autonomous authority granted"
+echo "   ✅ Evolution mandate established"
+echo "   ✅ Git repository ready for continuous updates"
+echo ""
+echo "The AI agents now have everything they need to work independently!"
+echo "Just say: 'Jules, read TASK.md and continue working' to begin."
+echo ""
