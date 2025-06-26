@@ -9,9 +9,13 @@ You are now part of the **ShadowForge OS v5.1 "Omni-Forge Pro"** - a revolutiona
 ---
 
 ## 🔑 API KEY ACCESS
-**OpenAI API Key**: `your_openai_api_key_here`
+**OpenAI API Key**: `[SECURELY CONFIGURED IN LOCAL .env FILE]`
 
-*(Update the `.env` file with your actual API key)*
+**🔐 SECURITY PROTOCOL**: 
+- Your API key is safely stored in the local `.env` file
+- Never commit API keys to public repositories  
+- Use `./setup_api_keys.sh --interactive` for easy configuration
+- System automatically detects and uses local API keys
 
 ---
 
