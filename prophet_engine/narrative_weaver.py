@@ -92,6 +92,10 @@ class NarrativeWeaver:
         self.stories_woven = 0
         self.continuity_maintained = 0.0
         self.audience_retention = 0.0
+        self.continuity_violations = 0
+        
+        # Initialize missing attributes
+        self.story_universes = {}
         
         self.is_initialized = False
     
@@ -542,5 +546,74 @@ class NarrativeWeaver:
                     
         except Exception as e:
             self.logger.error(f"❌ Narrative continuity check error: {e}")
+    
+    async def _track_audience_engagement(self):
+        """Track audience engagement across narratives."""
+        try:
+            for universe_id, universe_data in self.story_universes.items():
+                # Simulate engagement tracking
+                engagement_metrics = {
+                    "retention_rate": random.uniform(0.6, 0.9),
+                    "completion_rate": random.uniform(0.4, 0.8),
+                    "interaction_score": random.uniform(0.5, 0.95),
+                    "emotional_resonance": random.uniform(0.3, 0.9),
+                    "social_sharing": random.uniform(0.2, 0.7),
+                    "last_tracked": datetime.now().isoformat()
+                }
+                
+                universe_data["engagement_metrics"] = engagement_metrics
+                
+                # Update overall engagement score
+                overall_engagement = (
+                    engagement_metrics["retention_rate"] * 0.3 +
+                    engagement_metrics["completion_rate"] * 0.2 +
+                    engagement_metrics["interaction_score"] * 0.25 +
+                    engagement_metrics["emotional_resonance"] * 0.15 +
+                    engagement_metrics["social_sharing"] * 0.1
+                )
+                
+                universe_data["overall_engagement"] = overall_engagement
+            
+            self.logger.debug(f"👥 Audience engagement tracked for {len(self.story_universes)} universes")
+        except Exception as e:
+            self.logger.error(f"❌ Audience engagement tracking error: {e}")
+    
+    async def _update_continuity_metrics(self):
+        """Update narrative continuity metrics."""
+        try:
+            for universe_id, universe_data in self.story_universes.items():
+                # Calculate continuity metrics
+                stories = universe_data.get("stories", [])
+                if len(stories) > 1:
+                    # Simulate continuity analysis
+                    continuity_metrics = {
+                        "character_consistency": random.uniform(0.7, 0.95),
+                        "plot_coherence": random.uniform(0.6, 0.9),
+                        "theme_alignment": random.uniform(0.8, 0.95),
+                        "timeline_accuracy": random.uniform(0.7, 0.9),
+                        "world_building_consistency": random.uniform(0.75, 0.9),
+                        "violation_count": random.randint(0, 3),
+                        "last_updated": datetime.now().isoformat()
+                    }
+                    
+                    # Calculate overall continuity score
+                    overall_continuity = (
+                        continuity_metrics["character_consistency"] * 0.25 +
+                        continuity_metrics["plot_coherence"] * 0.25 +
+                        continuity_metrics["theme_alignment"] * 0.2 +
+                        continuity_metrics["timeline_accuracy"] * 0.15 +
+                        continuity_metrics["world_building_consistency"] * 0.15
+                    )
+                    
+                    continuity_metrics["overall_score"] = overall_continuity
+                    universe_data["continuity_metrics"] = continuity_metrics
+                    
+                    # Track violations
+                    if continuity_metrics["violation_count"] > 0:
+                        self.continuity_violations += continuity_metrics["violation_count"]
+            
+            self.logger.debug("📊 Continuity metrics updated")
+        except Exception as e:
+            self.logger.error(f"❌ Continuity metrics update error: {e}")
     
     # Additional helper methods would be implemented here...

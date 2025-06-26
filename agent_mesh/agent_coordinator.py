@@ -26,6 +26,7 @@ from .guardian.guardian_agent import GuardianAgent
 from .merchant.merchant_agent import MerchantAgent
 from .scholar.scholar_agent import ScholarAgent
 from .diplomat.diplomat_agent import DiplomatAgent
+from .jules.jules_agent import JulesAgent
 
 class AgentRole(Enum):
     """Specialized agent roles in the mesh."""
@@ -36,6 +37,7 @@ class AgentRole(Enum):
     MERCHANT = "merchant"
     SCHOLAR = "scholar"
     DIPLOMAT = "diplomat"
+    JULES = "jules"
 
 @dataclass
 class AgentMetrics:
@@ -92,7 +94,7 @@ class AgentCoordinator:
                 self.logger.warning(f"⚠️ LLM initialization failed: {e}")
                 return None
     
-    async def initialize(self, agent_count: int = 7):
+    async def initialize(self, agent_count: int = 8):
         """Initialize the agent mesh with specified number of agents."""
         try:
             self.logger.info(f"🤖 Initializing Agent Mesh with {agent_count} agents...")
@@ -297,6 +299,10 @@ class AgentCoordinator:
         self.agents["diplomat"] = DiplomatAgent(llm=self.llm)
         await self.agents["diplomat"].initialize()
         
+        # Initialize Jules Agent - Strategic reasoning & analysis specialist
+        self.agents["jules"] = JulesAgent(llm=self.llm)
+        await self.agents["jules"].initialize()
+        
         # Initialize metrics for all agents
         for agent_id in self.agents.keys():
             self.agent_metrics[agent_id] = AgentMetrics(
@@ -408,6 +414,10 @@ class AgentCoordinator:
         if any(word in description_lower for word in ["communicate", "user", "interface", "explain"]):
             analysis["domain"] = "communication"
             analysis["required_skills"].append("diplomat")
+        
+        if any(word in description_lower for word in ["analyze", "strategy", "reason", "plan", "solve"]):
+            analysis["domain"] = "strategic_reasoning"
+            analysis["required_skills"].append("jules")
         
         return analysis
     

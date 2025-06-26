@@ -111,6 +111,7 @@ class DeFiOrchestrator:
         
         # DeFi protocols (initialized here to avoid AttributeError)
         self.defi_protocols = {}
+        self.profit_opportunities = []
         
         self.is_initialized = False
     
@@ -813,5 +814,137 @@ class DeFiOrchestrator:
         self.logger.info("🔒 Production DeFi features enabled")
         self.max_position_size = Decimal('1000000')  # $1M max position
         self.gas_price_multiplier = 1.5  # 50% gas premium for production
+    
+    async def _execute_quick_wins(self):
+        """Execute quick win opportunities."""
+        try:
+            if hasattr(self, 'profit_opportunities'):
+                quick_wins = [opp for opp in self.profit_opportunities[:3] if opp.get('risk_score', 1) < 0.5]
+                for opportunity in quick_wins:
+                    self.logger.info(f"⚡ Executing quick win: {opportunity['type']} on {opportunity['protocol']}")
+        except Exception as e:
+            self.logger.error(f"❌ Quick win execution error: {e}")
+    
+    async def _rebalance_portfolio(self):
+        """Rebalance portfolio based on risk metrics."""
+        try:
+            if self.risk_metrics.get('overall_risk_score', 0) > 0.8:
+                self.logger.info("🔄 Rebalancing high-risk portfolio")
+                # Simulate portfolio rebalancing
+                await asyncio.sleep(0.1)
+        except Exception as e:
+            self.logger.error(f"❌ Portfolio rebalancing error: {e}")
+    
+    async def _identify_arbitrage_opportunities(self, price_discrepancies, max_capital):
+        """Identify arbitrage opportunities from price discrepancies."""
+        try:
+            opportunities = []
+            for discrepancy in price_discrepancies[:10]:
+                if discrepancy['arbitrage_potential'] > float(self.min_profit_threshold):
+                    opportunity = {
+                        "id": f"arb_{int(datetime.now().timestamp())}",
+                        "token": discrepancy['token'],
+                        "buy_protocol": discrepancy['protocol1'] if discrepancy['price1'] < discrepancy['price2'] else discrepancy['protocol2'],
+                        "sell_protocol": discrepancy['protocol2'] if discrepancy['price1'] < discrepancy['price2'] else discrepancy['protocol1'],
+                        "profit_potential": discrepancy['arbitrage_potential'],
+                        "required_capital": min(float(max_capital), discrepancy['liquidity_depth'] * 0.1),
+                        "confidence": discrepancy['confidence']
+                    }
+                    opportunities.append(opportunity)
+            return opportunities
+        except Exception as e:
+            self.logger.error(f"❌ Arbitrage identification error: {e}")
+            return []
+    
+    async def _execute_mev_strategies(self):
+        """Execute MEV strategies."""
+        try:
+            mev_opportunities = await self._scan_mev_opportunities()
+            for opportunity in mev_opportunities[:2]:  # Execute top 2
+                if opportunity['profit_potential'] > opportunity['gas_cost'] * 2:
+                    self.logger.info(f"⚡ Executing MEV strategy: {opportunity['type']}")
+                    # Simulate MEV execution
+                    self.mev_extracted += Decimal(str(opportunity['profit_potential'] - opportunity['gas_cost']))
+        except Exception as e:
+            self.logger.error(f"❌ MEV strategy execution error: {e}")
+    
+    async def _calculate_arbitrage_profits(self, opportunities, min_profit):
+        """Calculate profit potential for arbitrage opportunities."""
+        try:
+            profit_calculations = {}
+            for opportunity in opportunities:
+                # Simple profit calculation
+                profit_estimate = opportunity.get('arbitrage_potential', 0)
+                gas_cost = opportunity.get('gas_cost_estimate', 50)
+                net_profit = profit_estimate - gas_cost
+                
+                if net_profit >= float(min_profit):
+                    profit_calculations[opportunity['token']] = {
+                        'gross_profit': profit_estimate,
+                        'gas_cost': gas_cost,
+                        'net_profit': net_profit,
+                        'roi': net_profit / max(opportunity.get('required_capital', 1000), 1),
+                        'confidence': opportunity.get('confidence', 0.7)
+                    }
+            
+            return profit_calculations
+        except Exception as e:
+            self.logger.error(f"❌ Arbitrage profit calculation error: {e}")
+            return {}
+    
+    async def _rank_arbitrage_opportunities(self, opportunities, profit_potential):
+        """Rank arbitrage opportunities by profitability."""
+        try:
+            # Sort opportunities by profit potential
+            ranked = sorted(opportunities, 
+                          key=lambda x: x.get('profit_potential', 0), 
+                          reverse=True)
+            return ranked
+        except Exception as e:
+            self.logger.error(f"❌ Opportunity ranking error: {e}")
+            return opportunities
+    
+    async def _generate_arbitrage_execution_plans(self, opportunities):
+        """Generate execution plans for arbitrage opportunities."""
+        try:
+            plans = []
+            for opportunity in opportunities:
+                plan = {
+                    "opportunity_id": opportunity.get('id'),
+                    "execution_steps": [
+                        f"Buy {opportunity.get('token')} on {opportunity.get('buy_protocol')}",
+                        f"Sell {opportunity.get('token')} on {opportunity.get('sell_protocol')}",
+                        "Collect profit"
+                    ],
+                    "estimated_time": random.uniform(30, 180),
+                    "risk_level": random.choice(["low", "medium", "high"]),
+                    "success_probability": opportunity.get('confidence', 0.7)
+                }
+                plans.append(plan)
+            return plans
+        except Exception as e:
+            self.logger.error(f"❌ Execution plan generation error: {e}")
+            return []
+    
+    async def _execute_arbitrage_opportunities(self, plans):
+        """Execute arbitrage opportunities."""
+        try:
+            results = []
+            for plan in plans:
+                # Simulate execution
+                success = random.random() < plan.get('success_probability', 0.7)
+                result = {
+                    "plan_id": plan.get('opportunity_id'),
+                    "success": success,
+                    "profit": random.uniform(10, 500) if success else 0,
+                    "gas_cost": random.uniform(50, 200),
+                    "execution_time": random.uniform(30, 180),
+                    "executed_at": datetime.now().isoformat()
+                }
+                results.append(result)
+            return results
+        except Exception as e:
+            self.logger.error(f"❌ Arbitrage execution error: {e}")
+            return []
     
     # Additional helper methods would be implemented here...

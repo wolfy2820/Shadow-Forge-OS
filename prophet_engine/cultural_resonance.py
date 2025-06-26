@@ -478,4 +478,52 @@ class CulturalResonance:
         except Exception as e:
             self.logger.error(f"❌ Resonance pattern analysis error: {e}")
     
+    async def _update_archetypal_patterns(self):
+        """Update archetypal pattern analysis."""
+        try:
+            # Simulate archetypal pattern updates
+            self.archetypal_patterns = {
+                "hero_journey": random.uniform(0.7, 0.95),
+                "creation_myth": random.uniform(0.6, 0.85),
+                "transformation": random.uniform(0.75, 0.9),
+                "community_bonds": random.uniform(0.8, 0.95),
+                "rebellion": random.uniform(0.4, 0.7)
+            }
+            self.logger.debug("🏛️ Archetypal patterns updated")
+        except Exception as e:
+            self.logger.error(f"❌ Archetypal pattern update error: {e}")
+    
+    async def _update_resonance_matrix(self):
+        """Update cultural resonance matrix."""
+        try:
+            # Simulate resonance matrix updates
+            demographics = ["gen_z", "millennials", "gen_x", "boomers"]
+            cultures = ["western", "eastern", "latin", "african", "nordic"]
+            
+            for demo in demographics:
+                for culture in cultures:
+                    key = f"{demo}_{culture}"
+                    if key not in self.resonance_matrix:
+                        self.resonance_matrix[key] = {}
+                    
+                    self.resonance_matrix[key].update({
+                        "values_alignment": random.uniform(0.5, 0.9),
+                        "communication_style": random.uniform(0.6, 0.85),
+                        "trend_adoption": random.uniform(0.4, 0.8),
+                        "last_updated": datetime.now().isoformat()
+                    })
+            
+            self.logger.debug("🌐 Resonance matrix updated")
+        except Exception as e:
+            self.logger.error(f"❌ Resonance matrix update error: {e}")
+    
+    async def refresh_analysis(self):
+        """Refresh cultural analysis data."""
+        try:
+            await self._update_archetypal_patterns()
+            await self._update_resonance_matrix()
+            self.logger.info("🔄 Cultural analysis refreshed")
+        except Exception as e:
+            self.logger.error(f"❌ Cultural analysis refresh error: {e}")
+    
     # Additional helper methods would be implemented here...

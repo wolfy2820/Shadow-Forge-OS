@@ -621,4 +621,40 @@ class TrendPrecognition:
         except Exception as e:
             self.logger.error(f"❌ Prediction verification failed: {e}")
     
+    async def _rank_predictions_by_confidence(self, predictions: List[TrendPrediction]) -> List[TrendPrediction]:
+        """Rank predictions by confidence level."""
+        try:
+            # Define confidence weights
+            confidence_weights = {
+                TrendConfidence.CERTAINTY: 1.0,
+                TrendConfidence.VERY_HIGH: 0.9,
+                TrendConfidence.HIGH: 0.8,
+                TrendConfidence.MEDIUM: 0.6,
+                TrendConfidence.LOW: 0.4
+            }
+            
+            # Sort by confidence and virality score
+            ranked = sorted(predictions, 
+                          key=lambda p: (confidence_weights.get(p.confidence, 0.5), p.virality_score), 
+                          reverse=True)
+            
+            return ranked
+        except Exception as e:
+            self.logger.error(f"❌ Prediction ranking error: {e}")
+            return predictions
+    
+    async def _store_predictions(self, predictions: List[TrendPrediction]):
+        """Store predictions for verification and learning."""
+        try:
+            for prediction in predictions:
+                self.active_predictions[prediction.trend_id] = {
+                    "prediction": prediction,
+                    "created_at": datetime.now().isoformat(),
+                    "verified": False,
+                    "accuracy": None
+                }
+            self.logger.debug(f"📊 Stored {len(predictions)} predictions for verification")
+        except Exception as e:
+            self.logger.error(f"❌ Prediction storage error: {e}")
+    
     # Additional helper methods would be implemented here...
